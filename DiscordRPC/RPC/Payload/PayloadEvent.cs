@@ -1,6 +1,5 @@
-﻿using DiscordRPC.Converters;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DiscordRPC.RPC.Payload
 {
@@ -8,29 +7,32 @@ namespace DiscordRPC.RPC.Payload
 	/// Used for Discord IPC Events
 	/// </summary>
 	internal class EventPayload : IPayload
-	{
+    {
+        private static readonly JsonSerializerOptions JsonOpts = new()
+            { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault, NumberHandling = JsonNumberHandling.AllowReadingFromString };
+        
 		/// <summary>
 		/// The data the server sent too us
 		/// </summary>
-		[JsonProperty("data", NullValueHandling = NullValueHandling.Ignore)]
-		public JObject Data { get; set; }
+		[JsonPropertyName("data")]
+		public JsonElement Data { get; set; }
 
 		/// <summary>
 		/// The type of event the server sent
 		/// </summary>
-		[JsonProperty("evt"), JsonConverter(typeof(EnumSnakeCaseConverter))]
+		[JsonPropertyName("evt"), JsonConverter(typeof(JsonStringEnumConverter<ServerEvent>))]
 		public ServerEvent? Event { get; set; }
 
         /// <summary>
         /// Creates a payload with empty data
         /// </summary>
-		public EventPayload() : base() { Data = null; }
+		public EventPayload() : base() {  }
 
         /// <summary>
         /// Creates a payload with empty data and a set nonce
         /// </summary>
         /// <param name="nonce"></param>
-		public EventPayload(long nonce) : base(nonce) { Data = null; }
+		public EventPayload(long nonce) : base(nonce) {  }
         
 		/// <summary>
 		/// Gets the object stored within the Data
@@ -39,9 +41,8 @@ namespace DiscordRPC.RPC.Payload
 		/// <returns></returns>
 		public T GetObject<T>()
 		{
-			if (Data == null) return default(T);
-            return Data.ToObject<T>();
-		}
+            return Data.Deserialize<T>(JsonOpts);
+        }
 
         /// <summary>
         /// Converts the object into a human readable string

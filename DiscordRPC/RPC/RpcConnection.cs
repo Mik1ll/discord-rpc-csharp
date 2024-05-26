@@ -6,9 +6,9 @@ using DiscordRPC.RPC.Payload;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Newtonsoft.Json;
 using DiscordRPC.Logging;
 using DiscordRPC.Events;
+using System.Text.Json;
 
 namespace DiscordRPC.RPC
 {
@@ -471,7 +471,7 @@ namespace DiscordRPC.RPC
 			Logger.Info("Handling Response. Cmd: {0}, Event: {1}", response.Command, response.Event);
 
 			//Check if it is an error
-			if (response.Event.HasValue && response.Event.Value == ServerEvent.Error)
+			if (response.Event.HasValue && response.Event.Value == ServerEvent.ERROR)
 			{
 				//We have an error
 				Logger.Error("Error received from the RPC");
@@ -488,7 +488,7 @@ namespace DiscordRPC.RPC
 			//Check if its a handshake
 			if (State == RpcState.Connecting)
 			{
-				if (response.Command == Command.Dispatch && response.Event.HasValue && response.Event.Value == ServerEvent.Ready)
+				if (response.Command == Command.DISPATCH && response.Event.HasValue && response.Event.Value == ServerEvent.READY)
 				{
 					Logger.Info("Connection established with the RPC");
 					SetConnectionState(RpcState.Connected);
@@ -513,13 +513,13 @@ namespace DiscordRPC.RPC
 				switch(response.Command)
 				{
 					//We were sent a dispatch, better process it
-					case Command.Dispatch:
+					case Command.DISPATCH:
 						ProcessDispatch(response);
 						break;
 
 					//We were sent a Activity Update, better enqueue it
-					case Command.SetActivity:
-						if (response.Data == null)
+					case Command.SET_ACTIVITY:
+						if (response.Data.ValueKind == JsonValueKind.Undefined)
 						{
 							EnqueueMessage(new PresenceMessage());
 						}
@@ -530,18 +530,14 @@ namespace DiscordRPC.RPC
 						}
 						break;
 
-					case Command.Unsubscribe:
-					case Command.Subscribe:
-
-						//Prepare a serializer that can account for snake_case enums.
-						JsonSerializer serializer = new JsonSerializer();
-						serializer.Converters.Add(new Converters.EnumSnakeCaseConverter());
+					case Command.UNSUBSCRIBE:
+					case Command.SUBSCRIBE:
 
                         //Go through the data, looking for the evt property, casting it to a server event
                         var evt = response.GetObject<EventPayload>().Event.Value;
 
 						//Enqueue the appropriate message.
-						if (response.Command == Command.Subscribe)
+						if (response.Command == Command.SUBSCRIBE)
 							EnqueueMessage(new SubscribeMessage(evt));
 						else
 							EnqueueMessage(new UnsubscribeMessage(evt));
@@ -549,11 +545,11 @@ namespace DiscordRPC.RPC
 						break;
 						
 					
-					case Command.SendActivityJoinInvite:
+					case Command.SEND_ACTIVITY_JOIN_INVITE:
 						Logger.Trace("Got invite response ack.");
 						break;
 
-					case Command.CloseActivityJoinRequest:
+					case Command.CLOSE_ACTIVITY_JOIN_REQUEST:
 						Logger.Trace("Got invite response reject ack.");
 						break;
 						
@@ -570,23 +566,23 @@ namespace DiscordRPC.RPC
 
 		private void ProcessDispatch(EventPayload response)
 		{
-			if (response.Command != Command.Dispatch) return;
+			if (response.Command != Command.DISPATCH) return;
 			if (!response.Event.HasValue) return;
 
 			switch(response.Event.Value)
 			{
 				//We are to join the server
-				case ServerEvent.ActivitySpectate:
+				case ServerEvent.ACTIVITY_SPECTATE:
 					var spectate = response.GetObject<SpectateMessage>();
 					EnqueueMessage(spectate);
 					break;
 
-				case ServerEvent.ActivityJoin:
+				case ServerEvent.ACTIVITY_JOIN:
 					var join = response.GetObject<JoinMessage>();
 					EnqueueMessage(join);
 					break;
 
-				case ServerEvent.ActivityJoinRequest:
+				case ServerEvent.ACTIVITY_JOIN_REQUEST:
 					var request = response.GetObject<JoinRequestMessage>();
 					EnqueueMessage(request);
 					break;

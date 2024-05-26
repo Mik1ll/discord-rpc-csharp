@@ -1,6 +1,5 @@
-﻿using DiscordRPC.Converters;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DiscordRPC.RPC.Payload
 {
@@ -15,23 +14,23 @@ namespace DiscordRPC.RPC.Payload
 		/// <summary>
 		/// The data the server sent too us
 		/// </summary>
-		[JsonProperty("args", NullValueHandling = NullValueHandling.Ignore)]
-		public JObject Arguments { get; set; }
+		[JsonPropertyName("args")]
+		public JsonElement Arguments { get; set; }
 		
-		public ArgumentPayload() { Arguments = null; }
-		public ArgumentPayload(long nonce) : base(nonce) { Arguments = null; }
+		public ArgumentPayload() {  }
+		public ArgumentPayload(long nonce) : base(nonce) { }
 		public ArgumentPayload(object args, long nonce) : base(nonce)
 		{
 			SetObject(args);
 		}
 
 		/// <summary>
-		/// Sets the obejct stored within the data.
+		/// Sets the object stored within the data.
 		/// </summary>
 		/// <param name="obj"></param>
 		public void SetObject(object obj)
 		{
-			Arguments = JObject.FromObject(obj);
+            Arguments = JsonSerializer.SerializeToElement(obj);
 		}
 
 		/// <summary>
@@ -41,7 +40,7 @@ namespace DiscordRPC.RPC.Payload
 		/// <returns></returns>
 		public T GetObject<T>()
 		{
-			return Arguments.ToObject<T>();
+			return Arguments.Deserialize<T>();
 		}
 
 		public override string ToString()
@@ -50,4 +49,3 @@ namespace DiscordRPC.RPC.Payload
 		}
 	}
 }
-

@@ -1,51 +1,43 @@
-﻿using DiscordRPC.Converters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DiscordRPC.RPC.Payload
 {
 	/// <summary>
 	/// The possible commands that can be sent and received by the server.
 	/// </summary>
-	internal enum Command
+	[SuppressMessage("ReSharper", "InconsistentNaming")]
+    internal enum Command
 	{
 		/// <summary>
 		/// event dispatch
 		/// </summary>
-		[EnumValue("DISPATCH")]
-		Dispatch,
+		DISPATCH,
 
 		/// <summary>
 		/// Called to set the activity
 		/// </summary>
-		[EnumValue("SET_ACTIVITY")]
-		SetActivity,
+		SET_ACTIVITY,
 
 		/// <summary>
 		/// used to subscribe to an RPC event
 		/// </summary>
-		[EnumValue("SUBSCRIBE")]
-		Subscribe,
+		SUBSCRIBE,
 
 		/// <summary>
 		/// used to unsubscribe from an RPC event
 		/// </summary>
-		[EnumValue("UNSUBSCRIBE")]
-		Unsubscribe,
+		UNSUBSCRIBE,
 
 		/// <summary>
 		/// Used to accept join requests.
 		/// </summary>
-		[EnumValue("SEND_ACTIVITY_JOIN_INVITE")]
-		SendActivityJoinInvite,
+		SEND_ACTIVITY_JOIN_INVITE,
 
 		/// <summary>
 		/// Used to reject join requests.
 		/// </summary>
-		[EnumValue("CLOSE_ACTIVITY_JOIN_REQUEST")]
-		CloseActivityJoinRequest,
+		CLOSE_ACTIVITY_JOIN_REQUEST,
 
 		/// <summary>
 		/// used to authorize a new client with your app

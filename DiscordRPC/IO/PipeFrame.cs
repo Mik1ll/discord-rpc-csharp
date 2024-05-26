@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DiscordRPC.IO
 {
@@ -12,6 +11,9 @@ namespace DiscordRPC.IO
 	/// </summary>
 	public struct PipeFrame : IEquatable<PipeFrame>
 	{
+        private static readonly JsonSerializerOptions JsonOpts = new() 
+            {DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault, NumberHandling = JsonNumberHandling.AllowReadingFromString};
+        
 		/// <summary>
 		/// The maxium size of a pipe frame (16kb).
 		/// </summary>
@@ -78,8 +80,8 @@ namespace DiscordRPC.IO
 		/// </summary>
 		/// <param name="obj"></param>
 		public void SetObject(object obj)
-		{
-			string json = JsonConvert.SerializeObject(obj);
+        {
+            var json = JsonSerializer.Serialize(obj, JsonOpts);
 			SetMessage(json);
 		}
 
@@ -100,9 +102,9 @@ namespace DiscordRPC.IO
 		/// <typeparam name="T">The type to deserialize into</typeparam>
 		/// <returns></returns>
 		public T GetObject<T>()
-		{
-			string json = GetMessage();
-			return JsonConvert.DeserializeObject<T>(json);
+        {
+			var json = GetMessage();
+			return JsonSerializer.Deserialize<T>(json, JsonOpts);
 		}
 
 		/// <summary>
