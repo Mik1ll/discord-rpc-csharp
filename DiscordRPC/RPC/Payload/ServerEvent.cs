@@ -1,38 +1,38 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace DiscordRPC.RPC.Payload
+namespace DiscordRPC.RPC.Payload;
+
+/// <summary>
+/// See https://discordapp.com/developers/docs/topics/rpc#rpc-server-payloads-rpc-events for documentation
+/// </summary>
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+public enum ServerEvent
 {
+
     /// <summary>
-    /// See https://discordapp.com/developers/docs/topics/rpc#rpc-server-payloads-rpc-events for documentation
+    /// Sent when the server is ready to accept messages
     /// </summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public enum ServerEvent
-	{
+    READY,
 
-		/// <summary>
-		/// Sent when the server is ready to accept messages
-		/// </summary>
-		READY,
+    /// <summary>
+    /// Sent when something bad has happened
+    /// </summary>
+    ERROR,
 
-		/// <summary>
-		/// Sent when something bad has happened
-		/// </summary>
-		ERROR,
+    /// <summary>
+    /// Join Event 
+    /// </summary>
+    ACTIVITY_JOIN,
 
-		/// <summary>
-		/// Join Event 
-		/// </summary>
-		ACTIVITY_JOIN,
+    /// <summary>
+    /// Spectate Event
+    /// </summary>
+    ACTIVITY_SPECTATE,
 
-		/// <summary>
-		/// Spectate Event
-		/// </summary>
-		ACTIVITY_SPECTATE,
-
-		/// <summary>
-		/// Request Event
-		/// </summary>
-		ACTIVITY_JOIN_REQUEST,
+    /// <summary>
+    /// Request Event
+    /// </summary>
+    ACTIVITY_JOIN_REQUEST,
 
 #if INCLUDE_FULL_RPC
         //Old things that are obsolete
@@ -85,5 +85,4 @@ namespace DiscordRPC.RPC.Payload
         [EnumValue("CAPTURE_SHORTCUT_CHANGE")]
         CaptureShortcutChange
 #endif
-    }
 }

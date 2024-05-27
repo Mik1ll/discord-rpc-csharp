@@ -1,41 +1,40 @@
 ﻿using System;
 
-namespace DiscordRPC.Helper
+namespace DiscordRPC.Helper;
+
+internal class BackoffDelay
 {
+    /// <summary>
+    /// The maximum time the backoff can reach
+    /// </summary>
+    public int Maximum { get; private set; }
 
-	internal class BackoffDelay
-	{
-		/// <summary>
-		/// The maximum time the backoff can reach
-		/// </summary>
-		public int Maximum { get; private set; }
+    /// <summary>
+    /// The minimum time the backoff can start at
+    /// </summary>
+    public int Minimum { get; private set; }
 
-		/// <summary>
-		/// The minimum time the backoff can start at
-		/// </summary>
-		public int Minimum { get; private set; }
+    /// <summary>
+    /// The current time of the backoff
+    /// </summary>
+    public int Current { get { return _current; } }
+    private int _current;
 
-		/// <summary>
-		/// The current time of the backoff
-		/// </summary>
-		public int Current { get { return _current; } }
-		private int _current;
+    /// <summary>
+    /// The current number of failures
+    /// </summary>
+    public int Fails { get { return _fails; } }
+    private int _fails;
 
-		/// <summary>
-		/// The current number of failures
-		/// </summary>
-		public int Fails { get { return _fails; } }
-		private int _fails;
+    /// <summary>
+    /// The random generator
+    /// </summary>
+    public Random Random { get; set; }
 
-		/// <summary>
-		/// The random generator
-		/// </summary>
-		public Random Random { get; set; }
-
-		private BackoffDelay() { }
-		public BackoffDelay(int min, int max) : this(min, max, new Random()) { }
-		public BackoffDelay(int min, int max, Random random)
-		{
+    private BackoffDelay() { }
+    public BackoffDelay(int min, int max) : this(min, max, new Random()) { }
+    public BackoffDelay(int min, int max, Random random)
+    {
 			this.Minimum = min;
 			this.Maximum = max;
 
@@ -44,17 +43,17 @@ namespace DiscordRPC.Helper
 			this.Random = random;
 		}
 
-		/// <summary>
-		/// Resets the backoff
-		/// </summary>
-		public void Reset()
-		{
+    /// <summary>
+    /// Resets the backoff
+    /// </summary>
+    public void Reset()
+    {
 			_fails = 0;
 			_current = Minimum;
 		}
 
-		public int NextDelay()
-		{
+    public int NextDelay()
+    {
 			//Increment the failures
 			_fails++;
 
@@ -64,5 +63,4 @@ namespace DiscordRPC.Helper
 
 			return Math.Min(Math.Max(_current, Minimum), Maximum);
 		}
-	}
 }
