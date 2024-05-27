@@ -104,7 +104,7 @@ namespace DiscordRPC.Registry
         /// <returns></returns>
         public static string GetApplicationLocation()
         {
-            return Process.GetCurrentProcess().MainModule.FileName;
+            return Process.GetCurrentProcess().MainModule!.FileName;
         }
     }
 }

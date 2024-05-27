@@ -620,12 +620,12 @@ namespace DiscordRPC
         {
             get
             {
-                return Start.HasValue ? ToUnixMilliseconds(Start.Value) : (ulong?)null;
+                return Start.HasValue ? ToUnixMilliseconds(Start.Value) : null;
             }
 
             set
             {
-                Start = value.HasValue ? FromUnixMilliseconds(value.Value) : (DateTime?)null;
+                Start = value.HasValue ? FromUnixMilliseconds(value.Value) : null;
             }
         }
 
@@ -639,12 +639,12 @@ namespace DiscordRPC
         {
             get
             {
-                return End.HasValue ? ToUnixMilliseconds(End.Value) : (ulong?)null;
+                return End.HasValue ? ToUnixMilliseconds(End.Value) : null;
             }
 
             set
             {
-                End = value.HasValue ? FromUnixMilliseconds(value.Value) : (DateTime?)null;
+                End = value.HasValue ? FromUnixMilliseconds(value.Value) : null;
             }
         }
 
@@ -970,7 +970,7 @@ namespace DiscordRPC
 
             //Check buttons
             if (Buttons == null ^ other.Buttons == null) return false;
-            if (Buttons != null)
+            if (Buttons != null && other.Buttons != null)
             {
                 if (Buttons.Length != other.Buttons.Length) return false;
                 for (int i = 0; i < Buttons.Length; i++)

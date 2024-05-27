@@ -8,9 +8,9 @@
 		/// <summary>
 		/// The type of message
 		/// </summary>
-		public override MessageType Type { get { return MessageType.Close; } }
+		public override MessageType Type => MessageType.Close;
 
-		/// <summary>
+        /// <summary>
 		/// The reason for the close
 		/// </summary>
 		public string Reason { get; internal set; }
@@ -21,6 +21,6 @@
 		public int Code { get; internal set; }
 
 		internal CloseMessage() { }
-		internal CloseMessage(string reason) { this.Reason = reason; }
+		internal CloseMessage(string reason) { Reason = reason; }
 	}
 }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DiscordRPC.Logging;
 using System.IO.Pipes;
 using System.Threading;
@@ -49,12 +47,12 @@ namespace DiscordRPC.IO
         private int _connectedPipe;
         private NamedPipeClientStream _stream;
 
-        private byte[] _buffer = new byte[PipeFrame.MAX_SIZE];
+        private readonly byte[] _buffer;
 
         private Queue<PipeFrame> _framequeue = new Queue<PipeFrame>();
         private object _framequeuelock = new object();
 
-        private volatile bool _isDisposed = false;
+        private volatile bool _isDisposed;
         private volatile bool _isClosed = true;
 
         private object l_stream = new object();
@@ -181,19 +179,17 @@ namespace DiscordRPC.IO
                     if (_stream == null || !_stream.IsConnected) return;
 
                     Logger.Trace("Begining Read of {0} bytes", _buffer.Length);
-                    _stream.BeginRead(_buffer, 0, _buffer.Length, new AsyncCallback(EndReadStream), _stream.IsConnected);
+                    _stream.BeginRead(_buffer, 0, _buffer.Length, EndReadStream, _stream.IsConnected);
                 }
             }
             catch (ObjectDisposedException)
             {
                 Logger.Warning("Attempted to start reading from a disposed pipe");
-                return;
             }
             catch (InvalidOperationException)
             {
                 //The pipe has been closed
                 Logger.Warning("Attempted to start reading from a closed pipe");
-                return;
             }
             catch (Exception e)
             {
@@ -209,7 +205,7 @@ namespace DiscordRPC.IO
         private void EndReadStream(IAsyncResult callback)
         {
             Logger.Trace("Ending Read");
-            int bytes = 0;
+            int bytes;
 
             try
             {
@@ -491,12 +487,11 @@ namespace DiscordRPC.IO
         /// <returns></returns>
         private static string GetTemporaryDirectory()
         {
-            string temp = null;
-            temp = temp ?? Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
-            temp = temp ?? Environment.GetEnvironmentVariable("TMPDIR");
-            temp = temp ?? Environment.GetEnvironmentVariable("TMP");
-            temp = temp ?? Environment.GetEnvironmentVariable("TEMP");
-            temp = temp ?? "/tmp";
+            var temp = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
+            temp ??= Environment.GetEnvironmentVariable("TMPDIR");
+            temp ??= Environment.GetEnvironmentVariable("TMP");
+            temp ??= Environment.GetEnvironmentVariable("TEMP");
+            temp ??= "/tmp";
             return temp;
         }
 

@@ -10,9 +10,9 @@ namespace DiscordRPC.Message
 		/// <summary>
 		/// The type of message received from discord
 		/// </summary>
-		public override MessageType Type { get { return MessageType.JoinRequest; } }
+		public override MessageType Type => MessageType.JoinRequest;
 
-		/// <summary>
+        /// <summary>
 		/// The discord user that is requesting access.
 		/// </summary>
 		[JsonPropertyName("user")]

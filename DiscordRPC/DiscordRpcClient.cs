@@ -239,10 +239,9 @@ namespace DiscordRPC
             };
 
             //Subscribe to its event
-            connection.OnRpcMessage += (sender, msg) =>
+            connection.OnRpcMessage += (_, msg) =>
             {
-                if (OnRpcMessage != null)
-                    OnRpcMessage.Invoke(this, msg);
+                OnRpcMessage?.Invoke(this, msg);
 
                 if (AutoEvents)
                     ProcessMessage(msg);
@@ -314,8 +313,7 @@ namespace DiscordRPC
                         }
                     }
 
-                    if (OnPresenceUpdate != null)
-                        OnPresenceUpdate.Invoke(this, message as PresenceMessage);
+                    OnPresenceUpdate?.Invoke(this, message as PresenceMessage);
 
                     break;
 
@@ -333,20 +331,17 @@ namespace DiscordRPC
                         //Resend our presence and subscription
                         SynchronizeState();
                     }
-                   
-                    if (OnReady != null) 
-                        OnReady.Invoke(this, message as ReadyMessage);
-                 
+
+                    OnReady?.Invoke(this, message as ReadyMessage);
+
                     break;
 
                 case MessageType.Close:
-                    if (OnClose != null) 
-                        OnClose.Invoke(this, message as CloseMessage);
+                    OnClose?.Invoke(this, message as CloseMessage);
                     break;
 
                 case MessageType.Error:
-                    if (OnError != null)
-                        OnError.Invoke(this, message as ErrorMessage);
+                    OnError?.Invoke(this, message as ErrorMessage);
                     break;
 
                 //Update the request's CDN for the avatar helpers
@@ -355,54 +350,48 @@ namespace DiscordRPC
                     {
                         //Update the User object within the join request if the current Cdn
                         var jrm = message as JoinRequestMessage;
-                        if (jrm != null) jrm.User.SetConfiguration(Configuration);
+                        jrm?.User.SetConfiguration(Configuration);
                     }
-                    if (OnJoinRequested != null)
-                        OnJoinRequested.Invoke(this, message as JoinRequestMessage);
+
+                    OnJoinRequested?.Invoke(this, message as JoinRequestMessage);
                     break;
 
                 case MessageType.Subscribe:
                     lock (_sync)
                     {
-                        var sub = message as SubscribeMessage;
+                        var sub = (SubscribeMessage)message;
                         Subscription |= sub.Event;
-                    }   
-                    
-                    if (OnSubscribe != null) 
-                        OnSubscribe.Invoke(this, message as SubscribeMessage);
+                    }
+
+                    OnSubscribe?.Invoke(this, (SubscribeMessage)message);
 
                     break;
 
                 case MessageType.Unsubscribe:
                     lock (_sync)
                     {
-                        var unsub = message as UnsubscribeMessage;
+                        var unsub = (UnsubscribeMessage)message;
                         Subscription &= ~unsub.Event;
                     }
 
-                    if (OnUnsubscribe != null)
-                        OnUnsubscribe.Invoke(this, message as UnsubscribeMessage);
+                    OnUnsubscribe?.Invoke(this, (UnsubscribeMessage)message);
 
                     break;
 
                 case MessageType.Join:
-                    if (OnJoin != null)
-                        OnJoin.Invoke(this, message as JoinMessage);
+                    OnJoin?.Invoke(this, message as JoinMessage);
                     break;
 
                 case MessageType.Spectate:
-                    if (OnSpectate != null)
-                        OnSpectate.Invoke(this, message as SpectateMessage);
+                    OnSpectate?.Invoke(this, message as SpectateMessage);
                     break;
 
                 case MessageType.ConnectionEstablished:
-                    if (OnConnectionEstablished != null)
-                        OnConnectionEstablished.Invoke(this, message as ConnectionEstablishedMessage);
+                    OnConnectionEstablished?.Invoke(this, message as ConnectionEstablishedMessage);
                     break;
 
                 case MessageType.ConnectionFailed:
-                    if (OnConnectionFailed != null)
-                        OnConnectionFailed.Invoke(this, message as ConnectionFailedMessage);
+                    OnConnectionFailed?.Invoke(this, message as ConnectionFailedMessage);
                     break;
 
                 //We got a message we dont know what to do with.
@@ -884,7 +873,7 @@ namespace DiscordRPC
         /// 
         /// </summary>
         /// <param name="type"></param>
-        [System.Obsolete("Replaced with Unsubscribe", true)]
+        [Obsolete("Replaced with Unsubscribe", true)]
         public void Unubscribe(EventType type) { SetSubscription(Subscription & ~type); }
 
         /// <summary>

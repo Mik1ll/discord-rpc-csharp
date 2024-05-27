@@ -60,8 +60,6 @@ namespace DiscordRPC.Example
                     case "-pipe":
                         discordPipe = int.Parse(args[++i]);
                         break;
-
-                    default: break;
                 }
             }
 
@@ -80,19 +78,19 @@ namespace DiscordRPC.Example
         static void BasicExample()
         {
             // == Create the client
-            var client = new DiscordRpcClient("424087019149328395", pipe: discordPipe)
+            client = new DiscordRpcClient("424087019149328395", pipe: discordPipe)
             {
                 Logger = new Logging.ConsoleLogger(logLevel, true)
             };
 
             // == Subscribe to some events
-            client.OnReady += (sender, msg) =>
+            client.OnReady += (_, msg) =>
             {
                 //Create some events so we know things are happening
                 Console.WriteLine("Connected to discord with user {0}", msg.User.Username);
             };
 
-            client.OnPresenceUpdate += (sender, msg) =>
+            client.OnPresenceUpdate += (_, _) =>
             {
                 //The presence has updated
                 Console.WriteLine("Presence has been updated! ");
@@ -246,15 +244,15 @@ namespace DiscordRPC.Example
             //  once we finish this method. We only care to get the user info.
             // If you want to update the presence, dont do this but rather make it a singleton
             //  that lives throughout the lifetime of your app.
-            using var client = new DiscordRpcClient("424087019149328395", pipe: discordPipe)
+            using (client = new DiscordRpcClient("424087019149328395", pipe: discordPipe)
             {
                 Logger = new Logging.ConsoleLogger(logLevel, true)
-            };
+            })
 
             // == Sub to ready
             // We are going to listen to the On Ready. Once we have it, we will tell the completion
             //  source to continue with the result.
-            client.OnReady += (sender, msg) =>
+            client.OnReady += (_, msg) =>
             {
                 readyCompletionSource.SetResult(msg.User);
             };
@@ -376,7 +374,7 @@ namespace DiscordRPC.Example
 			*/
 
             //We have received a request, dump a bunch of information for the user
-            Console.WriteLine("'{0}' has requested to join our game.", args.User.ToString());
+            Console.WriteLine("'{0}' has requested to join our game.", args.User);
             Console.WriteLine(" - User's Avatar: {0}", args.User.GetAvatarURL(User.AvatarFormat.GIF, User.AvatarSize.x2048));
             Console.WriteLine(" - User's Username: {0}", args.User.Username);
             Console.WriteLine(" - User's Snowflake: {0}", args.User.ID);
@@ -387,8 +385,8 @@ namespace DiscordRPC.Example
             bool accept = Console.ReadKey().Key == ConsoleKey.Y; Console.WriteLine();
 
             //Tell the client if we accept or not.
-            DiscordRpcClient client = (DiscordRpcClient)sender;
-            client.Respond(args, accept);
+            DiscordRpcClient senderClient = (DiscordRpcClient)sender;
+            senderClient.Respond(args, accept);
 
             //All done.
             Console.WriteLine(" - Sent a {0} invite to the client {1}", accept ? "ACCEPT" : "REJECT", args.User.Username);
@@ -398,7 +396,7 @@ namespace DiscordRPC.Example
         #endregion
 
 
-        static int cursorIndex = 0;
+        static int cursorIndex;
         static string previousCommand = "";
         static void ProcessKey()
         {

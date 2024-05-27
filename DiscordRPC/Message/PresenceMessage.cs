@@ -10,9 +10,9 @@ namespace DiscordRPC.Message
 		/// <summary>
 		/// The type of message received from discord
 		/// </summary>
-		public override MessageType Type { get { return MessageType.PresenceUpdate; } }
+		public override MessageType Type => MessageType.PresenceUpdate;
 
-		internal PresenceMessage() : this(null) { }
+        internal PresenceMessage() : this(null) { }
 		internal PresenceMessage(RichPresenceResponse rpr)
 		{
 			if (rpr == null)
@@ -23,7 +23,7 @@ namespace DiscordRPC.Message
 			}
 			else
 			{
-				Presence = (BaseRichPresence)rpr;
+				Presence = rpr;
 				Name = rpr.Name;
 				ApplicationID = rpr.ClientID;
 			}

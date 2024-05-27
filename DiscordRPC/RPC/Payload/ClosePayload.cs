@@ -17,9 +17,8 @@ namespace DiscordRPC.RPC.Payload
 		public string Reason { get; set; }
 
 		[JsonConstructor]
-		public ClosePayload() 
-			: base() 
-		{ 
+		public ClosePayload()
+        { 
 			Code = -1; 
 			Reason = ""; 
 		}

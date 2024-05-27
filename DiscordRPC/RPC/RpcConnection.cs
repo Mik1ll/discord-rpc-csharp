@@ -76,12 +76,12 @@ namespace DiscordRPC.RPC
 		/// <summary>
 		/// The configuration received by the Ready
 		/// </summary>
-		public Configuration Configuration { get { Configuration tmp = null; lock (l_config) tmp = _configuration; return tmp; } }
-		private Configuration _configuration = null;
+		public Configuration Configuration { get { Configuration tmp; lock (l_config) tmp = _configuration; return tmp; } }
+		private Configuration _configuration;
 		private readonly object l_config = new object();
 
-		private volatile bool aborting = false;
-		private volatile bool shutdown = false;
+		private volatile bool aborting;
+		private volatile bool shutdown;
 		
 		/// <summary>
 		/// Indicates if the RPC connection is still running in the background
@@ -274,9 +274,9 @@ namespace DiscordRPC.RPC
             if (Logger.Level <= LogLevel.Trace)
             {
                 Logger.Trace("============================");
-                Logger.Trace("Assembly:             " + System.Reflection.Assembly.GetAssembly(typeof(RichPresence)).FullName);
+                Logger.Trace("Assembly:             " + System.Reflection.Assembly.GetAssembly(typeof(RichPresence))!.FullName);
                 Logger.Trace("Pipe:                 " + namedPipe.GetType().FullName);
-                Logger.Trace("Platform:             " + Environment.OSVersion.ToString());
+                Logger.Trace("Platform:             " + Environment.OSVersion);
                 Logger.Trace("applicationID:        " + applicationID);
                 Logger.Trace("targetPipe:           " + targetPipe);
                 Logger.Trace("POLL_RATE:            " + POLL_RATE);
@@ -534,7 +534,7 @@ namespace DiscordRPC.RPC
 					case Command.SUBSCRIBE:
 
                         //Go through the data, looking for the evt property, casting it to a server event
-                        var evt = response.GetObject<EventPayload>().Event.Value;
+                        var evt = response.GetObject<EventPayload>().Event!.Value;
 
 						//Enqueue the appropriate message.
 						if (response.Command == Command.SUBSCRIBE)
@@ -612,7 +612,7 @@ namespace DiscordRPC.RPC
 
 			//Prepare some variabels we will clone into with locks
 			bool needsWriting = true;
-			ICommand item = null;
+			ICommand item;
 			
 			//Continue looping until we dont need anymore messages
 			while (needsWriting && namedPipe.IsConnected)
@@ -735,8 +735,7 @@ namespace DiscordRPC.RPC
 			if (!namedPipe.WriteFrame(new PipeFrame(Opcode.Close, new Handshake() { Version = VERSION, ClientID = applicationID })))
 			{
 				Logger.Error("failed to write a handwave.");
-				return;
-			}
+            }
 		}
 		
 

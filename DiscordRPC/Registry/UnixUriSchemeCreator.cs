@@ -1,10 +1,7 @@
 ﻿using DiscordRPC.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace DiscordRPC.Registry
 {
@@ -89,11 +86,11 @@ MimeType=x-scheme-handler/discord-{2}";
             string arguments = string.Format(format, appid);
 
             //Run the process and wait for response
-            Process process = Process.Start("xdg-mime", arguments);
-            process.WaitForExit();
+            var process = Process.Start("xdg-mime", arguments);
+            process?.WaitForExit();
             
             //Return if succesful
-            return process.ExitCode >= 0;
+            return process?.ExitCode == 0;
         }
     }
 }
